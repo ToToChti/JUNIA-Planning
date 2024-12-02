@@ -1,3 +1,7 @@
+plannings/
+mails.json
+userLogs.json
+
 # Logs
 logs
 *.log
