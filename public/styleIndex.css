@@ -1,0 +1,83 @@
+* {
+    font-family: "Segoe UI"
+}
+
+html {
+    background-color: #2e2e2e;
+}
+
+body {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    /* overflow: hidden; */
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f06b42;
+}
+
+.box {
+    max-width: 600px;
+    width: 95%;
+    text-align: center;
+    background-color: white;
+    border-radius: 10px;
+    color: #3f2a56;
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.warning {
+    width: 95%;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.title {
+    width: 100%;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+form {
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center
+}
+
+form label {
+    width: 100%;
+    text-align: left;
+}
+
+form div {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+form div input[type="email"] {
+    width: 70%;
+}
+form div input[type="submit"] {
+    width: 25%;
+}
+
+@media screen and (max-width: 600px) {
+    .warning {
+        font-size: 7px;
+    }
+}

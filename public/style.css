@@ -1,0 +1,252 @@
+*{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    background: #f06b42;
+    /* background: linear-gradient(315deg, rgba(255,111,0,1) 0%, rgba(106,0,255,1) 100%); */
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+/*     overflow: hidden; */
+    position: relative;
+}
+
+
+.headTableBox {
+    display: flex;
+    justify-content: space-between;
+    width: 95%;
+    margin: 15px;
+}
+
+.displayedWeek {
+    font-size: 20px;
+    font-weight: 500;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.buttonBox {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.currentDate {
+    background-color: #DDDDDD;
+}
+
+.ohoh {
+    background: none;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+    border: 0;
+}
+
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    opacity: 0.8;
+    border-radius: 50%;
+    animation: fall linear;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+.planningSubject.exam {
+    background-color: red;
+}
+
+.planningSubject.auto {
+    background-color: gold;
+}
+
+.infoCourseBox {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 500px;
+    width: 95%;
+    background-color: white;
+    box-shadow: 3px 3px 20px 0px #00000073;
+    border-radius: 10px;
+    border: 5px solid #f06b42;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    padding: 15px;
+    box-sizing: border-box;
+    color: #3f2a56;
+}
+
+.topInfo {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+}
+
+.topInfo img {
+    height: 20px;
+    padding: 5px;
+}
+
+.topInfoTitle {
+    font-size: 25px;
+    font-weight: 700;
+    color: #3f2a56;
+}
+
+th.date {
+    height: 30px;
+}
+
+.courseInfo {
+    width: 100%;
+}
+
+.info {
+    
+}
+
+.infoType {
+    font-weight: 700;
+
+}
+
+.infoDesc {
+    
+}
+
+.buttonBox button {
+    width: 45%;
+    border-radius: 5px;
+    background-color: #3f2a56;
+    color: white;
+    border: 0px;
+    padding: 5px 10px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+table {
+    border: 1px solid lightgray;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    position: relative;
+    width: 95%;
+    height: 75%;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden ;
+    box-shadow: 5px 5px 30px 0px black;
+    margin-bottom: 15px;
+}
+
+th {
+    width: 15%;
+    border: 1px solid lightgray;
+}
+
+th:first-child {
+    width: 10%;
+}
+
+td {
+    border: 1px solid lightgray;
+    width: 100px;
+    height: 15px;
+    /* background-color: blue; */
+}
+
+td.time {
+    vertical-align: sub;
+}
+
+.planningSubject {
+    background-color: limegreen;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid black;
+    border-radius: 5px;
+    box-sizing: border-box;
+    color: white;
+    padding: 3px;
+    font-size: 13px;
+    inline-size: 100%;
+    overflow-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+}
+
+.planningSubject:hover {
+    height: auto!important;
+    z-index: 1;
+
+}
+
+.room {
+    font-size: 10px;
+    margin-bottom: 8px;
+}
+
+.courseName {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+
+
+@media screen and (max-width: 600px) {
+    .planningSubject {
+        font-size: 10px;
+        inline-size: 100%;
+        overflow-wrap: break-word;
+    }
+
+    th {
+        font-size: 10px;
+    }
+
+    .courseName {
+        font-size: 10px;    
+    }
+
+    td.time {
+        font-size: 10px;
+        /* display: flex; */
+        /*flex-direction: column;
+        justify-content: left; */
+    }
+
+    .headTableBox {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+  }

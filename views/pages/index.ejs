@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Recupérer votre planning JUNIA facilement et rapidement (RIP WebAurion)">
+  <meta property="og:title" content="JUNIA Planning">
+  <meta property="og:description" content="Recupérer votre planning JUNIA facilement et rapidement (RIP WebAurion)">
+  <meta property="og:image" content="https://cdn.glitch.global/4b1ade99-0dbe-4329-a547-b735a17c2b84/404_junia.jpg?v=1729464162466">
+  <meta property="og:url" content="https://junia-planning.glitch.me/">
+  <meta property="theme-color" content="#3f2a56">
+
+  <title>Planning De Secours</title>
+
+  <link rel="shortcut icon" href="https://cdn.glitch.global/4b1ade99-0dbe-4329-a547-b735a17c2b84/404_junia.jpg?v=1729464162466">
+  <link rel="stylesheet" href="styleIndex.css">
+</head>
+
+<body>
+
+  <div class="box">
+    <div class="title">JUNIA Planning</div>
+    <div class="subtitle">Retrouvez facilement et rapidement votre planning</div>
+
+
+    <form method="get" action="/planning">
+      <label for="email">Adresse email:</label>
+      
+      <div>
+        <input name="email" type="email" id="email" required autocomplete="email">
+        <input type="submit">
+      </div>
+    </form>
+
+    <% if(error) {%>
+      <p style="color: red">
+        <%= error %>
+      </p>
+      <% }%>
+
+    <p class="warning">
+      Attention :<br>
+      Ce site n'est pas une plateforme officielle et n'est pas controlée par le 2345.<br>
+      En cas d'erreur dans le planning, nous ne sommes en aucun cas responsables.<br>
+      Seul le Excel fourni par JUNIA fait office de planning officiel.
+    </p>
+  </div>
+
+    
+
+</body>
+
+</html>

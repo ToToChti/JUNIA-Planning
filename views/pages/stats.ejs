@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .info-container {
+            margin-bottom: 20px;
+        }
+        .info-container h2 {
+            margin-bottom: 10px;
+        }
+        canvas {
+            max-width: 90%;
+            height: 900px;
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-container">
+        <h2>General Information</h2>
+        <p><strong>Total Visits:</strong> <span id="totalVisits"></span></p>
+        <p><strong>Different Visitors:</strong> <span id="differentVisitors"></span></p>
+    </div>
+
+    <div class="info-container">
+        <h2>Graph</h2>
+        <canvas id="logsChart"></canvas>
+    </div>
+
+    <script>
+        const logs = <%- stats %>;
+const days = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+
+// Update general information
+document.getElementById('totalVisits').textContent = logs.nbVisits;
+document.getElementById('differentVisitors').textContent = logs.differentVisitor;
+
+// Generate full date range including today
+const timestamps = Object.keys(logs.nbVisitsPerDay).map(ts => parseInt(ts)).sort((a, b) => a - b);
+const startDate = new Date(timestamps[0]);
+const endDate = new Date(Math.max(timestamps[timestamps.length - 1], Date.now())); // Ensure today is included
+
+const dateRange = [];
+for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    dateRange.push(new Date(d)); // Add each date in the range
+}
+
+// Generate labels and fill missing data with defaults
+const labels = dateRange.map(date => {
+    const localTimestamp = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000); // Align to local time
+    return days[(localTimestamp.getDay() + 6) % 7] + " " + localTimestamp.toLocaleDateString();
+});
+
+const visitsData = dateRange.map(date => {
+    const timestamp = date.setHours(0, 0, 0, 0); // Align to local midnight
+    return logs.nbVisitsPerDay[timestamp] || 0; // Default to 0 if no data
+});
+
+const newUsersData = dateRange.map(date => {
+    const timestamp = date.setHours(0, 0, 0, 0); // Align to local midnight
+    return logs.newUsersPerDay[timestamp] || 0; // Default to 0 if no data
+});
+
+const diffVisitorPerDay = dateRange.map(date => {
+    const timestamp = date.setHours(0, 0, 0, 0); // Align to local midnight
+    return logs.nbDifferentVisitorPerDay[timestamp] || 0; // Default to 0 if no data
+});
+
+// Debugging: Log the data being processed
+console.log("Labels:", labels);
+console.log("Visits Data:", visitsData);
+console.log("New Users Data:", newUsersData);
+
+// Chart.js configuration
+const ctx = document.getElementById('logsChart').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'New Users Per Day',
+                data: newUsersData,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2
+            },
+            {
+                label: 'Visits Per Day',
+                data: visitsData,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Daily Logs Data'
+            }
+        }
+    }
+});
+
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Recupérer votre planning JUNIA facilement et rapidement (RIP WebAurion)">
+    <meta property="og:title" content="JUNIA Planning">
+    <meta property="og:description" content="Recupérer votre planning JUNIA facilement et rapidement (RIP WebAurion)">
+    <meta property="og:image"
+        content="https://cdn.glitch.global/4b1ade99-0dbe-4329-a547-b735a17c2b84/404_junia.jpg?v=1729464162466">
+    <meta property="og:url" content="https://junia-planning.glitch.me/">
+    <meta name="theme-color" content="#3f2a56">
+
+
+
+    <title>Planning De Secours</title>
+
+    <link rel="shortcut icon"
+        href="https://cdn.glitch.global/4b1ade99-0dbe-4329-a547-b735a17c2b84/404_junia.jpg?v=1729464162466">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <button class="ohoh" onclick="ohoh()"></button>
+
+    <div class="headTableBox">
+        <div class="displayedWeek">Du <span id="beginWeekDate">11/11/2024</span> au <span
+                id="endWeekDate">16/11/2024</span></div>
+        <div class="buttonBox">
+            <button onclick="prevPagePlanning()"> Semaine Précédente </button>
+            <button onclick="nextPagePlanning()"> Semaine Suivante </button>
+        </div>
+    </div>
+
+    <div class="infoCourseBox" style="display: none;">
+        <div class="topInfo">
+            <div class="topInfoTitle">Info</div>
+            <img src="crossIcon.svg" onclick="leaveInfoWindow()" alt="crossLeaveIcon">
+        </div>
+        <div class="courseInfo">
+            <div class="info"><span class="infoType">Cours : </span><span class="infoDesc"
+                    id="courseName">Pourquoi</span></div>
+            <div class="info"><span class="infoType">Salle : </span><span class="infoDesc" id="courseRoom">tu</span>
+            </div>
+            <div class="info"><span class="infoType">Horaire : </span><span class="infoDesc"
+                    id="courseTime">fouilles</span></div>
+            <div class="info"><span class="infoType">Type : </span><span class="infoDesc" id="courseType">ici?</span>
+            </div>
+            <div class="info"><span class="infoType">Intervenant : </span><span class="infoDesc"
+                    id="courseIntervenant">MP moi</span></div>
+            <div class="info"><span class="infoType">Description : </span><span class="infoDesc" id="courseDesc">arsial
+                    (discord)</span></div>
+        </div>
+    </div>
+
+    <audio style="display: none;" src="https://cdn.glitch.global/4b1ade99-0dbe-4329-a547-b735a17c2b84/public%2Fsound.mp3?v=1731600358492"></audio>
+
+    <table>
+        <thead>
+        </thead>
+
+        <tbody>
+
+        </tbody>
+    </table>
+
+
+    <script>
+
+        let daySearched = new Date();
+        let table = document.querySelector('table');
+        let thead = document.querySelector("table thead");
+        let tbody = document.querySelector("table tbody");
+
+        const beginTime = 7;
+        const endTime = 20;
+
+        let allWeekDates = [];
+
+        let data = localStorage.getItem("name");
+
+        if (data) {
+
+            data = {}
+
+            data.name = localStorage.getItem('name');
+            data.subjects = [];
+
+            let nbSubj = Object.keys(localStorage).filter(key => key.startsWith("subject_")).length;
+
+            for (let i = 0; i < nbSubj; ++i) {
+                data.subjects.push(JSON.parse(localStorage.getItem(`subject_${i}`)));
+            }
+
+            displayPlanning()
+        }
+
+        async function loadPlanning(email) {
+            if (!email) return;
+
+            let response = await fetch('/getPlanning?email=' + email)
+            let result = await response.json();
+
+            localStorage.clear();
+
+            result.subjects.forEach((subj, i) => {
+                localStorage.setItem("subject_" + i, JSON.stringify(subj));
+            })
+
+            localStorage.setItem("name", result.name);
+
+            data = result;
+
+            displayPlanning();
+        }
+
+        loadPlanning("<%- email %>");
+
+
+        let easterEggActivated = false;
+
+        function ohoh() {
+
+            // Définition des couleurs de l'échelle en format RGB
+            const colorScale = [
+                { r: 255, g: 0, b: 0 },    // Rouge
+                { r: 255, g: 255, b: 0 },  // Jaune
+                { r: 0, g: 255, b: 0 },    // Vert
+                { r: 0, g: 255, b: 255 },  // Cyan
+                { r: 0, g: 0, b: 255 },    // Bleu
+                { r: 255, g: 0, b: 255 },  // Magenta
+                { r: 255, g: 0, b: 0 }     // Retour au rouge
+            ];
+
+            let currentColorIndex = 0; // Index de la couleur actuelle
+            let nextColorIndex = 1;    // Index de la couleur suivante
+            let step = 0;              // Étape de transition entre les deux couleurs
+            const transitionSteps = 5; // Nombre de steps pour une transition complète
+
+            // Fonction pour interpoler entre deux couleurs
+            function interpolateColor(color1, color2, factor) {
+                const r = Math.round(color1.r + factor * (color2.r - color1.r));
+                const g = Math.round(color1.g + factor * (color2.g - color1.g));
+                const b = Math.round(color1.b + factor * (color2.b - color1.b));
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
+            // Fonction de transition de couleur
+            function transitionColor() {
+                const factor = step / transitionSteps;
+                const color = interpolateColor(colorScale[currentColorIndex], colorScale[nextColorIndex], factor);
+                document.body.style.backgroundColor = color;
+
+                step++;
+                if (step > transitionSteps) {
+                    step = 0;
+                    currentColorIndex = nextColorIndex;
+                    nextColorIndex = (nextColorIndex + 1) % colorScale.length;
+                }
+            }
+
+            // Lance la transition toutes les 50 ms
+            if (!easterEggActivated) {
+                document.querySelector('audio').play();
+                document.querySelector('audio').volume = 0.05;
+
+                easterEggActivated = true;
+                setInterval(transitionColor, 50);
+            }
+
+            else {
+                document.querySelector('audio').pause();
+            }
+
+            const confettiCount = 100; // Nombre de confettis
+            const colors = ["#ff4081", "#3f51b5", "#4caf50", "#ffeb3b", "#ff5722", "#00bcd4"];
+
+            for (let i = 0; i < confettiCount; i++) {
+                // Création d'un élément confetti
+                const confetti = document.createElement("div");
+                confetti.classList.add("confetti");
+
+                // Définir une couleur aléatoire parmi la liste
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+                // Positionnement aléatoire pour l'apparition des confettis
+                confetti.style.left = `${Math.random() * 95 + 2}vw`;
+                confetti.style.top = `${-10 + Math.random() * 20}vh`;
+
+                // Taille et vitesse aléatoire pour chaque confetti
+                const size = Math.random() * 8 + 5; // taille entre 5px et 13px
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`; // durée entre 2s et 5s
+
+                // Ajouter l'élément confetti au body
+                document.body.appendChild(confetti);
+
+                // Supprimer le confetti après l'animation pour éviter l'encombrement du DOM
+                confetti.addEventListener("animationend", () => {
+                    confetti.remove();
+                });
+            }
+
+
+        }
+
+
+
+        function fillWeekDates(daySearched) {
+            allWeekDates = [];
+
+            let beginDate = getStartOfWeek(daySearched);
+
+            for (let i = 0; i < 6; ++i) {
+                allWeekDates.push(new Date(beginDate.getTime() + i * 24 * 60 * 60 * 1000));
+            }
+        }
+
+        function nextPagePlanning() {
+            daySearched = new Date(daySearched.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+            // table.innerHTML = "";
+
+            fillWeekDates(daySearched);
+
+            addSubjects();
+
+            editTimeHeader();
+
+        }
+
+        function prevPagePlanning() {
+            daySearched = new Date(daySearched.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            fillWeekDates(daySearched);
+
+            addSubjects();
+
+            editTimeHeader();
+
+        }
+
+
+        function getStartOfWeek(date) {
+            // Cloner la date pour ne pas modifier l'originale
+            const startOfWeek = new Date(date);
+
+            // Calculer le jour de la semaine (0 = dimanche, 1 = lundi, ...)
+            const day = startOfWeek.getDay();
+
+            // Ajuster pour que lundi soit le début de la semaine
+            const distanceToMonday = (day === 0 ? -6 : 1) - day;
+
+            // Reculer au lundi de la semaine actuelle
+            startOfWeek.setDate(startOfWeek.getDate() + distanceToMonday);
+
+            // Remettre les heures, minutes, secondes, millisecondes à zéro pour avoir le début de la journée
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            return startOfWeek;
+        }
+
+
+        function createTableHeader() {
+            // Head Row
+            let startDate = getStartOfWeek(daySearched);
+
+            let tHead = document.createElement("tr");
+
+            for (let i = 0; i < 7; ++i) {
+
+                let tData = document.createElement("th");
+                tData.classList.add('date');
+                tData.style.height = ((table.clientHeight) / (endTime - beginTime + 1)) + 'px';
+                tData.innerText = "a";
+
+                tHead.appendChild(tData);
+            }
+
+            thead.appendChild(tHead);
+
+        }
+
+        function leaveInfoWindow() {
+            document.querySelector('.infoCourseBox').style.display = 'none';
+        }
+
+        function openInfoWindow(event) {
+            event.stopPropagation();
+
+            let elem = event.target;
+
+            if (elem.id == '') elem = elem.parentNode;
+
+
+            let subject = data.subjects[elem.id];
+            let timeStr = "";
+            let hours = subject.beginTime.getUTCHours();
+            let minutes = subject.beginTime.getUTCMinutes();
+
+            timeStr += hours < 10 ? "0" + hours : hours;
+            timeStr += ":";
+            timeStr += minutes < 10 ? "0" + minutes : minutes;
+
+            hours = subject.endTime.getUTCHours();
+            minutes = subject.endTime.getUTCMinutes();
+
+            timeStr += " - "
+            timeStr += hours < 10 ? "0" + hours : hours;
+            timeStr += ":";
+            timeStr += minutes < 10 ? "0" + minutes : minutes;
+
+            document.querySelector("#courseName").innerText = subject.courseName;
+            document.querySelector("#courseDesc").innerText = subject.description;
+            document.querySelector("#courseIntervenant").innerText = subject.intervenant;
+            document.querySelector("#courseTime").innerText = timeStr;
+            document.querySelector("#courseType").innerText = subject.type;
+            document.querySelector("#courseRoom").innerText = subject.room;
+
+            document.querySelector('.infoCourseBox').style.display = 'block';
+        }
+
+
+        function editTimeHeader() {
+            // Head Row
+            let startDate = getStartOfWeek(daySearched);
+
+            let date = new Date();
+            date.setHours(0, 0, 0, 0);
+
+            let allTimeHeaders = document.querySelectorAll("th.date");
+
+
+            // Formater la date (par exemple, en 'DD/MM' pour un format jour/mois)
+            let day = startDate.getDate().toString().padStart(2, '0');
+            let month = (startDate.getMonth() + 1).toString().padStart(2, '0');
+            let year = startDate.getFullYear().toString()
+
+            let str = `${day}/${month}/${year}`;
+            document.querySelector('#beginWeekDate').innerText = str;
+
+
+
+            let endDate = new Date(getStartOfWeek(daySearched).getTime() + 5 * 24 * 60 * 60 * 1000);
+
+            day = endDate.getDate().toString().padStart(2, '0');
+            month = (endDate.getMonth() + 1).toString().padStart(2, '0');
+            year = endDate.getFullYear().toString()
+
+            str = `${day}/${month}/${year}`;
+            document.querySelector('#endWeekDate').innerText = str;
+
+
+            for (let i = 0; i < 7; ++i) {
+
+                if (i != 0) {
+                    // Créer une nouvelle date en ajoutant 'i' jours à la date de début de semaine
+                    let currentDate = new Date(startDate);
+                    currentDate.setDate(startDate.getDate() + i - 1); // Décalage de 1 car l'index 1 = lundi
+
+                    // Formater la date (par exemple, en 'DD/MM' pour un format jour/mois)
+                    let day = currentDate.getDate().toString().padStart(2, '0');
+                    let month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+
+                    let str = `${day}/${month}`;
+
+
+                    if (currentDate.getTime() == date.getTime()) {
+                        allTimeHeaders[i].classList.add('currentDate');
+
+                        document.querySelectorAll("tr").forEach((tr, index) => {
+                            if (index == 0) return
+
+                            tr.querySelectorAll("td")[i].classList.add('currentDate')
+                        })
+                    }
+                    else {
+                        allTimeHeaders[i].classList.remove('currentDate');
+
+                        document.querySelectorAll("tr").forEach((tr, index) => {
+                            if (index == 0) return
+
+                            tr.querySelectorAll("td")[i].classList.remove('currentDate')
+                        })
+                    }
+
+                    allTimeHeaders[i].innerHTML = str;
+                }
+
+                else {
+                    allTimeHeaders[i].innerHTML = ''
+                }
+            }
+        }
+
+        function createTableBody() {
+
+            let allTableHead = document.querySelectorAll("th.date");
+
+            for (let row = beginTime; row <= endTime; ++row) {
+
+                let rowCells = document.createElement("tr");
+
+                for (let col = 0; col < 7; ++col) {
+
+                    let cell = document.createElement("td");
+
+                    if (col == 0) {
+                        cell.innerText = row < 10 ? "0" + row + ":00" : row + ":00";
+                        cell.classList.add('time');
+
+                        cell.style.height = ((table.clientHeight) / (endTime - beginTime + 1)) + 'px';
+                    }
+
+                    else {
+
+                        cell.id = /* ADD DATE */ + '_' + (row < 10 ? "0" + row + ":00" : row + ":00");
+                        cell.classList.add('planningContent');
+                    }
+
+                    rowCells.appendChild(cell);
+
+                }
+
+                tbody.appendChild(rowCells);
+
+            }
+
+        }
+
+        function getTableCoordinates(subject) {
+            let tableCellWidth = document.querySelector('td.planningContent').clientWidth;
+            let tableCellHeight = document.querySelector('td.planningContent').clientHeight;
+
+            let timeCellWidth = document.querySelector('td.time').clientWidth;
+            let dateCellHeight = document.querySelector('th.date').clientHeight;
+
+            let xIdx = {
+                begin: allWeekDates.indexOf(allWeekDates.find(date => compareDate(subject.date, date) == 0)) + 0,
+                end: allWeekDates.indexOf(allWeekDates.find(date => compareDate(subject.date, date) == 0)) + 1
+            }
+
+
+            let yIdx = {
+                begin: (subject.beginTime.getHours() + subject.endTime.getTimezoneOffset() / 60) + subject.beginTime.getMinutes() / 60 - beginTime,
+                end: (subject.endTime.getHours() + subject.endTime.getTimezoneOffset() / 60) + subject.endTime.getMinutes() / 60 - beginTime
+            }
+
+            const marginTotal = 4;
+
+            let width = (xIdx.end - xIdx.begin) * (tableCellWidth + 2) - marginTotal;
+
+            let filteredArr = data.subjects.filter(subj => compareDate(subj.date, subject.date) == 0 && (compareDate(subj.endTime, subject.beginTime) >= 0 && compareDate(subj.beginTime, subject.endTime) <= 0));
+
+            let idxInArr = filteredArr.indexOf(subject) / filteredArr.length;
+
+
+            return {
+                x: (xIdx.begin + idxInArr) * (tableCellWidth + 1) + timeCellWidth + marginTotal / 2,
+                y: yIdx.begin * (tableCellHeight) + dateCellHeight,
+                height: (yIdx.end - yIdx.begin) * (tableCellHeight + 1),
+                width: ((xIdx.end - xIdx.begin) * (tableCellWidth + 2)) / filteredArr.length - marginTotal
+
+            }
+        }
+
+        function transformLitteralToDate(string) {
+            let date = string.split("/");
+            return new Date(`${date[1]}/${date[0]}/${date[2]}`);
+        }
+
+        function transformLitteralToHour(string) {
+            let time = string.split(':');
+            let date = new Date('0');
+            date.setTime('0');
+            date.setUTCHours(time[0]);
+            date.setUTCMinutes(time[1]);
+            return date;
+        }
+
+        function compareDate(date1, date2) {
+            return Math.sign(date1.getTime() - date2.getTime());
+        }
+
+        function addSubjects() {
+
+            let subjects = data.subjects;
+
+            document.querySelectorAll('.planningSubject').forEach(elem => elem.remove());
+
+            subjects.forEach((subject, idx) => {
+
+                if (!allWeekDates.find(date => compareDate(subject.date, date) == 0)) return;
+
+                let subjectBeginTime = subject.beginTime;
+                let subjectEndTime = subject.endTime;
+
+                let cellCoordinates = getTableCoordinates(subject);
+
+                let cell = document.createElement('div');
+                cell.classList.add('planningSubject');
+                cell.id = idx;
+
+                const examNameList = ["interrogation orale", "ds", "partiel", "interrogation", "contrôle continu avec surveillance", "devoir surveillé avec surveillance", "examen avec surveillance", "interrogation avec surveillance", "avec surveillance"];
+                const autoNameList = ["auto apprentissage", "projet auto géré", "td autogéré planifié", "tp autogéré planifié"];
+
+                if (examNameList.find(name => subject.type.toLowerCase().includes(name))) {
+                    cell.classList.add("exam");
+                }
+
+                if (autoNameList.find(name => subject.type.toLowerCase().includes(name))) {
+                    cell.classList.add("auto");
+                }
+
+                cell.onclick = openInfoWindow;
+
+
+                cell.style.left = cellCoordinates.x + "px";
+                cell.style.top = cellCoordinates.y + "px";
+
+                cell.style.height = cellCoordinates.height + "px";
+                cell.style.minHeight = cellCoordinates.height + "px";
+                cell.style.width = cellCoordinates.width + "px";
+
+                cell.innerHTML = `<div class="room">${subject.room}</div><div class="courseName">${subject.courseName}</div><div class="intervenant">${subject.intervenant}</div>`
+
+                table.appendChild(cell);
+
+            })
+
+        }
+
+        function displayPlanning() {
+            document.title = "Planning de " + data.name;
+
+            data.subjects.forEach(subject => {
+                subject.date = transformLitteralToDate(subject.date);
+                subject.beginTime = transformLitteralToHour(subject.beginTime);
+                subject.endTime = transformLitteralToHour(subject.endTime);
+            })
+
+            document.querySelector('thead').innerHTML = '';
+            document.querySelector('tbody').innerHTML = '';
+
+            fillWeekDates(daySearched);
+            createTableHeader();
+            createTableBody();
+            editTimeHeader();
+            addSubjects();
+        }
+
+
+
+        window.onresize = () => {
+            // thead.remove();
+
+            editTimeHeader();
+
+            fillWeekDates(daySearched);
+
+            addSubjects();
+        }
+
+        document.addEventListener('click', (event) => {
+            leaveInfoWindow();
+        })
+
+        document.querySelector(".infoCourseBox").addEventListener('click', e => {
+            e.stopPropagation();
+        })
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key == "Escape") {
+                leaveInfoWindow();
+            }
+        })
+
+    </script>
+
+</body>
+
+</html>
