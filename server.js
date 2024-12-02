@@ -15,6 +15,7 @@
  *
  *
  *    This code has been produced by Arsial (GitHub: ToToChti)
+ *    ---> https://github.com/ToToChti/junia-planning
  * 
  *    Some parts of the code might have been produced by ChatGPT (OpenAI)
  *    but most of the code is hand-written
@@ -128,11 +129,8 @@ app.get('/getPlanning', (req, res) => {
 
 })
 
-// about page
+// Returning planning
 app.get('/planning', function (req, res) {
-
-  if (DEBUG_MODE) console.log("Starting response...")
-  let startTime = new Date().getTime();
 
   if (!req.query || !req.query.email)
     return res.render("pages/index", { error: "Email not found" });
