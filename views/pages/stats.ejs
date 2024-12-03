@@ -74,11 +74,12 @@ const diffVisitorPerDay = dateRange.map(date => {
     const timestamp = date.setHours(0, 0, 0, 0); // Align to local midnight
     return logs.nbDifferentVisitorPerDay[timestamp] || 0; // Default to 0 if no data
 });
-
+    
 // Debugging: Log the data being processed
 console.log("Labels:", labels);
 console.log("Visits Data:", visitsData);
 console.log("New Users Data:", newUsersData);
+console.log("Nb visitors per day Data:", diffVisitorPerDay);
 
 // Chart.js configuration
 const ctx = document.getElementById('logsChart').getContext('2d');
@@ -99,6 +100,13 @@ new Chart(ctx, {
                 data: visitsData,
                 borderColor: 'rgba(255, 99, 132, 1)',
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderWidth: 2
+            },
+            {
+                label: 'Different Visitor Per Day',
+                data: diffVisitorPerDay,
+                borderColor: 'rgba(0, 255, 132, 0.2)',
+                backgroundColor: 'rgba(0, 255, 132, 1)',
                 borderWidth: 2
             }
         ]

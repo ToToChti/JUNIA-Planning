@@ -67,6 +67,7 @@ app.get('/stats', (req, res) => {
     "nbVisitsPerDay": {},
     "nbDifferentVisitorPerDay": {}
   }
+  let counter = 0;
 
   Object.keys(logs).forEach(key => {
 
@@ -87,14 +88,51 @@ app.get('/stats', (req, res) => {
       stats.nbVisitsPerDay[visitDate.getTime()]++;
       stats.nbVisits++;
 
-      if (!stats.nbDifferentVisitorPerDay[visitDate.getTime()]) stats.nbDifferentVisitorPerDay[visitDate.getTime()] = 0;
+      // if (!stats.nbDifferentVisitorPerDay[visitDate.getTime()]) {
+      //   console.log(stats.nbDifferentVisitorPerDay[visitDate.getTime()])
+      //   stats.nbDifferentVisitorPerDay[visitDate.getTime()] = 0;
+      //   console.log("Creation of date - ", key, Object.keys(stats.nbDifferentVisitorPerDay).length)
+      // }
       
-      if(!alreadyVisited) {
-        alreadyVisited = true;
-        stats.nbDifferentVisitorPerDay[visitDate.getTime()]++;
-      }
+      // if(!alreadyVisited) {
+      //   console.log("Yep")
+      //   alreadyVisited = true;
+      //   stats.nbDifferentVisitorPerDay[visitDate.getTime()]++;
+      // }
 
     })
+
+    counter++;
+
+    let visitDates = []
+
+    logs[key].visits.forEach(visit => {
+      let visitDate = new Date(visit);
+      visitDate.setHours(0, 0, 0, 0);
+
+      if(!visitDates.find(date => date == visitDate.getTime())) {
+        visitDates.push(visitDate.getTime())
+      }
+
+
+      // if(!alreadyVisited) {
+      //   alreadyVisited = true;
+      //   console.log(counter)
+      // }
+    })
+
+    visitDates.forEach(date => {
+      
+      if(!stats.nbDifferentVisitorPerDay[date]) {
+        stats.nbDifferentVisitorPerDay[date] = 1;
+      }
+
+      else {
+        stats.nbDifferentVisitorPerDay[date]++;
+      }
+
+    })    
+
   })
 
   res.render('pages/stats', { stats: JSON.stringify(stats, false, 2) });
@@ -102,11 +140,13 @@ app.get('/stats', (req, res) => {
 
 
 app.get('/getPlanning', (req, res) => {
-  if (!req.query || !req.query.email) {
+  const mails = JSON.parse(fs.readFileSync("mails.json"));
+
+  let foundEmail = Object.values(mails).find(mail => req.query.email.toLowerCase() == mail)
+  
+  if (!req.query || !req.query.email || !foundEmail) {
       return res.render("pages/index", { error: "Email not found" });
   }
-
-  const mails = JSON.parse(fs.readFileSync("mails.json"));
 
   let email = req.query.email.toLowerCase();
   let name = Object.keys(mails).find(key => mails[key] == email);
@@ -117,7 +157,7 @@ app.get('/getPlanning', (req, res) => {
   // LOGGING SYSTEM
   let logs = JSON.parse(fs.readFileSync("./userLogs.json"));
 
-  logs[email] = logs[email] ?? {
+  logs[email] = logs[email] || {
     email,
     name,
     visits: []
@@ -132,7 +172,10 @@ app.get('/getPlanning', (req, res) => {
 // Returning planning
 app.get('/planning', function (req, res) {
 
-  if (!req.query || !req.query.email)
+  let db = JSON.parse(fs.readFileSync("mails.json"));
+  let foundEmail = Object.values(db).find(mail => req.query.email.toLowerCase() == mail)
+
+  if (!req.query || !req.query.email || !foundEmail)
     return res.render("pages/index", { error: "Email not found" });
 
   res.render('pages/planning', { email: req.query.email.toLowerCase() });
@@ -249,7 +292,7 @@ function simplifyData(datas) {
       data[1] = mails[data[0]];
     }
 
-    finalData[data[1]] = finalData[data[1]] ?? {
+    finalData[data[1]] = finalData[data[1]] || {
       name: data[0],
       email: data[1],
       subjects: []
