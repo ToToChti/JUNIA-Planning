@@ -67,7 +67,6 @@ app.get('/stats', (req, res) => {
     "nbVisitsPerDay": {},
     "nbDifferentVisitorPerDay": {}
   }
-  let counter = 0;
 
   Object.keys(logs).forEach(key => {
 
@@ -88,21 +87,7 @@ app.get('/stats', (req, res) => {
       stats.nbVisitsPerDay[visitDate.getTime()]++;
       stats.nbVisits++;
 
-      // if (!stats.nbDifferentVisitorPerDay[visitDate.getTime()]) {
-      //   console.log(stats.nbDifferentVisitorPerDay[visitDate.getTime()])
-      //   stats.nbDifferentVisitorPerDay[visitDate.getTime()] = 0;
-      //   console.log("Creation of date - ", key, Object.keys(stats.nbDifferentVisitorPerDay).length)
-      // }
-      
-      // if(!alreadyVisited) {
-      //   console.log("Yep")
-      //   alreadyVisited = true;
-      //   stats.nbDifferentVisitorPerDay[visitDate.getTime()]++;
-      // }
-
     })
-
-    counter++;
 
     let visitDates = []
 
@@ -113,26 +98,16 @@ app.get('/stats', (req, res) => {
       if(!visitDates.find(date => date == visitDate.getTime())) {
         visitDates.push(visitDate.getTime())
       }
-
-
-      // if(!alreadyVisited) {
-      //   alreadyVisited = true;
-      //   console.log(counter)
-      // }
     })
 
     visitDates.forEach(date => {
-      
       if(!stats.nbDifferentVisitorPerDay[date]) {
         stats.nbDifferentVisitorPerDay[date] = 1;
       }
-
       else {
         stats.nbDifferentVisitorPerDay[date]++;
       }
-
     })    
-
   })
 
   res.render('pages/stats', { stats: JSON.stringify(stats, false, 2) });
